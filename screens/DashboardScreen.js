@@ -1,8 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { auth } from '../services/firebaseConfig';
-import { getClasses } from '../utils/attendanceUtils';
+import { auth, db } from '../services/firebaseConfig';
 import { useTheme } from '../context/ThemeContext';
 
 export default function DashboardScreen({ navigation }) {
@@ -12,20 +11,23 @@ export default function DashboardScreen({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
-      loadClasses();
+      const unsub = db
+        .collection('classes')
+        .where('teacherId', '==', auth.currentUser?.uid)
+        .onSnapshot(
+          (snapshot) => {
+            const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            setClasses(data);
+            setLoading(false);
+          },
+          (err) => {
+            console.error(err);
+            setLoading(false);
+          }
+        );
+      return () => unsub();
     }, [])
   );
-
-  async function loadClasses() {
-    try {
-      const data = await getClasses();
-      setClasses(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   if (loading) {
     return (

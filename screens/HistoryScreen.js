@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity,
 } from 'react-native';
-import { getClasses, getAttendanceHistory } from '../utils/attendanceUtils';
+import { useFocusEffect } from '@react-navigation/native';
+import { db, auth } from '../services/firebaseConfig';
+import { getClasses } from '../utils/attendanceUtils';
 import { useTheme } from '../context/ThemeContext';
 
 export default function HistoryScreen() {
@@ -12,8 +14,13 @@ export default function HistoryScreen() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingRecords, setLoadingRecords] = useState(false);
+  const unsubRecords = useRef(null);
 
-  useEffect(() => { loadClasses(); }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadClasses();
+    }, [])
+  );
 
   async function loadClasses() {
     try {
@@ -26,18 +33,37 @@ export default function HistoryScreen() {
     }
   }
 
-  async function loadHistory(classId) {
-    setLoadingRecords(true);
-    setSelectedClass(classId);
-    try {
-      const data = await getAttendanceHistory(classId);
-      setRecords(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingRecords(false);
+  useEffect(() => {
+    if (unsubRecords.current) {
+      unsubRecords.current();
     }
-  }
+    if (!selectedClass) {
+      setRecords([]);
+      return;
+    }
+    setLoadingRecords(true);
+    unsubRecords.current = db
+      .collection('attendance')
+      .where('classId', '==', selectedClass)
+      .orderBy('timestamp', 'desc')
+      .onSnapshot(
+        (snapshot) => {
+          const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          setRecords(data);
+          setLoadingRecords(false);
+        },
+        (err) => {
+          console.error(err);
+          setLoadingRecords(false);
+        }
+      );
+    return () => {
+      if (unsubRecords.current) {
+        unsubRecords.current();
+        unsubRecords.current = null;
+      }
+    };
+  }, [selectedClass]);
 
   function formatDate(timestamp) {
     if (!timestamp) return '';
@@ -70,7 +96,7 @@ export default function HistoryScreen() {
               { backgroundColor: colors.surface, borderColor: colors.border },
               selectedClass === item.id && { backgroundColor: colors.primary, borderColor: colors.primary },
             ]}
-            onPress={() => loadHistory(item.id)}
+            onPress={() => setSelectedClass(item.id)}
           >
             <Text
               style={[

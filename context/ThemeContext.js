@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 
 const light = {
   background: '#f0f2f5',
@@ -40,16 +40,25 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   const [isDark, setIsDark] = useState(false);
 
+  const themePath = FileSystem.documentDirectory + 'theme.json';
+
   useEffect(() => {
-    AsyncStorage.getItem('theme').then((val) => {
-      if (val === 'dark') setIsDark(true);
-    });
+    (async () => {
+      try {
+        const info = await FileSystem.getInfoAsync(themePath);
+        if (info.exists) {
+          const content = await FileSystem.readAsStringAsync(themePath);
+          const { isDark } = JSON.parse(content);
+          setIsDark(isDark);
+        }
+      } catch {}
+    })();
   }, []);
 
   function toggleTheme() {
     setIsDark((prev) => {
       const next = !prev;
-      AsyncStorage.setItem('theme', next ? 'dark' : 'light');
+      FileSystem.writeAsStringAsync(themePath, JSON.stringify({ isDark: next })).catch(() => {});
       return next;
     });
   }

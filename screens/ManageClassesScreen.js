@@ -4,7 +4,7 @@ import {
   ActivityIndicator, Alert, TextInput, Modal,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { db } from '../services/firebaseConfig';
+import { auth, db } from '../services/firebaseConfig';
 import { getClasses } from '../utils/attendanceUtils';
 import { useTheme } from '../context/ThemeContext';
 
@@ -63,6 +63,7 @@ export default function ManageClassesScreen({ navigation }) {
         await db.collection('classes').add({
           name: name.trim(),
           section: section.trim(),
+          teacherId: auth.currentUser.uid,
         });
       }
       setModalVisible(false);

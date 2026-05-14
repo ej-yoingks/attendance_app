@@ -4,7 +4,7 @@ import {
   ActivityIndicator, Alert, TextInput, Modal,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { db } from '../services/firebaseConfig';
+import { auth, db } from '../services/firebaseConfig';
 import { useTheme } from '../context/ThemeContext';
 
 export default function ManageStudentsScreen({ route }) {
@@ -24,7 +24,11 @@ export default function ManageStudentsScreen({ route }) {
 
   async function loadStudents() {
     try {
-      const snapshot = await db.collection('students').where('classId', '==', classId).get();
+      const snapshot = await db
+        .collection('students')
+        .where('classId', '==', classId)
+        .where('teacherId', '==', auth.currentUser?.uid)
+        .get();
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setStudents(data);
     } catch (err) {
@@ -60,6 +64,7 @@ export default function ManageStudentsScreen({ route }) {
         await db.collection('students').add({
           name: name.trim(),
           classId,
+          teacherId: auth.currentUser.uid,
         });
       }
       setModalVisible(false);

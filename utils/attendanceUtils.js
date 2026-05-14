@@ -1,4 +1,4 @@
-import { db } from '../services/firebaseConfig';
+import { auth, db } from '../services/firebaseConfig';
 
 export async function saveAttendance(classId, studentRecords, date) {
   const batch = [];
@@ -11,6 +11,7 @@ export async function saveAttendance(classId, studentRecords, date) {
         status: record.status,
         date: date || new Date(),
         timestamp: new Date(),
+        teacherId: auth.currentUser?.uid,
       })
     );
   });
@@ -27,7 +28,10 @@ export async function getAttendanceHistory(classId) {
 }
 
 export async function getClasses() {
-  const snapshot = await db.collection('classes').get();
+  const snapshot = await db
+    .collection('classes')
+    .where('teacherId', '==', auth.currentUser?.uid)
+    .get();
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
