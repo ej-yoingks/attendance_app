@@ -85,55 +85,57 @@ export default function HistoryScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.heading, { color: colors.text }]}>Attendance History</Text>
 
-      <FlatList
-        horizontal
-        data={classes}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.classList}
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => {
-          const active = selectedClass === item.id;
-          return (
-            <TouchableOpacity
-              style={[
-                styles.classChip,
-                {
-                  backgroundColor: active ? colors.primary : colors.surface,
-                  borderColor: active ? colors.primary : colors.border,
-                },
-              ]}
-              onPress={() => setSelectedClass(item.id)}
-            >
-              <View style={[styles.chipAvatar, { backgroundColor: active ? '#ffffff30' : colors.primary + '20' }]}>
-                <Text style={[styles.chipAvatarText, { color: active ? '#fff' : colors.primary }]}>
-                  {item.name?.charAt(0)?.toUpperCase() || 'C'}
-                </Text>
-              </View>
-              <View style={styles.chipTextWrap}>
-                <Text
-                  style={[
-                    styles.classChipText,
-                    { color: active ? '#fff' : colors.text },
-                  ]}
-                >
-                  {item.name}
-                </Text>
-                {item.section ? (
+      <View style={styles.chipsWrapper}>
+        <FlatList
+          horizontal
+          data={classes}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.classList}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => {
+            const active = selectedClass === item.id;
+            return (
+              <TouchableOpacity
+                style={[
+                  styles.classChip,
+                  {
+                    backgroundColor: active ? colors.primary : colors.surface,
+                    borderColor: colors.border,
+                  },
+                ]}
+                onPress={() => setSelectedClass(item.id)}
+              >
+                <View style={[styles.chipAvatar, { backgroundColor: active ? '#ffffff30' : colors.primary + '20' }]}>
+                  <Text style={[styles.chipAvatarText, { color: active ? '#fff' : colors.primary }]}>
+                    {item.name?.charAt(0)?.toUpperCase() || 'C'}
+                  </Text>
+                </View>
+                <View style={styles.chipTextWrap}>
                   <Text
                     style={[
-                      styles.chipSection,
-                      { color: active ? '#ffffffaa' : colors.subtext },
+                      styles.classChipText,
+                      { color: active ? '#fff' : colors.text },
                     ]}
-                    numberOfLines={1}
                   >
-                    {item.section}
+                    {item.name}
                   </Text>
-                ) : null}
-              </View>
-            </TouchableOpacity>
-          );
-        }}
-      />
+                  {item.section ? (
+                    <Text
+                      style={[
+                        styles.chipSection,
+                        { color: active ? '#ffffffaa' : colors.subtext },
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {item.section}
+                    </Text>
+                  ) : null}
+                </View>
+              </TouchableOpacity>
+            );
+          }}
+        />
+      </View>
 
       {loadingRecords ? (
         <View style={[styles.center, { flex: 1 }]}>
@@ -186,6 +188,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   heading: { fontSize: 26, fontWeight: '800', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 14, letterSpacing: -0.5 },
+  chipsWrapper: { height: 76, justifyContent: 'center' },
   classList: { paddingHorizontal: 16, paddingBottom: 14 },
   classChip: {
     flexDirection: 'row',
@@ -195,9 +198,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1.5,
     marginRight: 10,
-    gap: 10,
+    minHeight: 60,
   },
-  chipAvatar: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  chipAvatar: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 10 },
   chipAvatarText: { fontSize: 16, fontWeight: '800' },
   chipTextWrap: {},
   classChipText: { fontSize: 15, fontWeight: '700' },

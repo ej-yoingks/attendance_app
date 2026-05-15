@@ -37,7 +37,13 @@ export default function LoginScreen() {
       <View style={styles.inner}>
         <View style={styles.brandArea}>
           <View style={[styles.iconCircle, { backgroundColor: colors.primary }]}>
-            <Text style={styles.iconText}>A</Text>
+            <View style={styles.logoGroup}>
+              <View style={styles.logoDotSmall} />
+              <View style={styles.logoGroupInner}>
+                <View style={styles.logoDot} />
+                <View style={styles.logoDotWide} />
+              </View>
+            </View>
           </View>
           <Text style={[styles.title, { color: colors.text }]}>Attendify</Text>
           <Text style={[styles.subtitle, { color: colors.subtext }]}>
@@ -107,7 +113,37 @@ const styles = StyleSheet.create({
     shadowRadius: 24,
     elevation: 10,
   },
-  iconText: { fontSize: 32, fontWeight: '800', color: '#fff' },
+  logoGroup: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+  },
+  logoDotSmall: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#fff',
+    opacity: 0.6,
+  },
+  logoGroupInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  logoDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+  },
+  logoDotWide: {
+    width: 14,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+  },
   title: { fontSize: 32, fontWeight: '800', letterSpacing: -0.5, marginBottom: 6 },
   subtitle: { fontSize: 15, textAlign: 'center' },
   form: { width: '100%' },
