@@ -104,7 +104,7 @@ export default function ManageClassesScreen({ navigation }) {
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Manage Classes</Text>
         <TouchableOpacity style={[styles.addBtn, { backgroundColor: colors.primary }]} onPress={openAdd}>
-          <Text style={styles.addBtnText}>+ Add Class</Text>
+          <Text style={styles.addBtnText}>+ New</Text>
         </TouchableOpacity>
       </View>
 
@@ -113,17 +113,25 @@ export default function ManageClassesScreen({ navigation }) {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
+          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <TouchableOpacity
               style={styles.cardContent}
               onPress={() => navigation.navigate('ManageStudents', { classId: item.id, className: item.name })}
             >
-              <Text style={[styles.cardTitle, { color: colors.text }]}>{item.name}</Text>
-              <Text style={[styles.cardSub, { color: colors.subtext }]}>{item.section || 'No section'}</Text>
+              <View style={[styles.iconBox, { backgroundColor: colors.primary + '20' }]}>
+                <Text style={[styles.iconText, { color: colors.primary }]}>
+                  {item.name?.charAt(0) || 'C'}
+                </Text>
+              </View>
+              <View style={styles.cardText}>
+                <Text style={[styles.cardTitle, { color: colors.text }]}>{item.name}</Text>
+                <Text style={[styles.cardSub, { color: colors.subtext }]}>{item.section || 'No section'}</Text>
+              </View>
+              <Text style={[styles.cardArrow, { color: colors.subtext }]}>→</Text>
             </TouchableOpacity>
-            <View style={styles.cardActions}>
+            <View style={[styles.cardActions, { borderTopColor: colors.border }]}>
               <TouchableOpacity onPress={() => openEdit(item)} style={styles.actionBtn}>
-                <Text style={styles.editText}>Edit</Text>
+                <Text style={[styles.editText, { color: colors.primary }]}>Edit</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleDelete(item)} style={styles.actionBtn}>
                 <Text style={styles.deleteText}>Delete</Text>
@@ -132,15 +140,19 @@ export default function ManageClassesScreen({ navigation }) {
           </View>
         )}
         ListEmptyComponent={
-          <Text style={[styles.empty, { color: colors.subtext }]}>No classes yet. Tap "+ Add Class".</Text>
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyIcon}>📚</Text>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>No Classes</Text>
+            <Text style={[styles.emptySub, { color: colors.subtext }]}>Tap "+ New" to add one</Text>
+          </View>
         }
       />
 
-      <Modal visible={modalVisible} transparent animationType="slide">
+      <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.overlay}>
           <View style={[styles.modal, { backgroundColor: colors.surface }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>
-              {editItem ? 'Edit Class' : 'Add Class'}
+              {editItem ? 'Edit Class' : 'New Class'}
             </Text>
             <TextInput
               style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.background }]}
@@ -182,38 +194,45 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 12,
   },
-  title: { fontSize: 22, fontWeight: '800' },
-  addBtn: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8 },
+  title: { fontSize: 24, fontWeight: '800', letterSpacing: -0.5 },
+  addBtn: { paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10 },
   addBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
-  list: { paddingHorizontal: 20, paddingBottom: 24 },
-  card: { borderRadius: 12, marginVertical: 4, overflow: 'hidden' },
-  cardContent: { padding: 16 },
-  cardTitle: { fontSize: 16, fontWeight: '600' },
+  list: { paddingHorizontal: 16, paddingBottom: 24 },
+  card: { borderRadius: 16, marginVertical: 5, borderWidth: 1, overflow: 'hidden' },
+  cardContent: { flexDirection: 'row', alignItems: 'center', padding: 16 },
+  iconBox: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
+  iconText: { fontSize: 20, fontWeight: '800' },
+  cardText: { flex: 1 },
+  cardTitle: { fontSize: 16, fontWeight: '700' },
   cardSub: { fontSize: 13, marginTop: 2 },
-  cardActions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#eee' },
-  actionBtn: { flex: 1, paddingVertical: 10, alignItems: 'center' },
-  editText: { color: '#2196f3', fontWeight: '600' },
-  deleteText: { color: '#f44336', fontWeight: '600' },
-  empty: { textAlign: 'center', marginTop: 40, fontSize: 15 },
+  cardArrow: { fontSize: 18, fontWeight: '300' },
+  cardActions: { flexDirection: 'row', borderTopWidth: 1 },
+  actionBtn: { flex: 1, paddingVertical: 12, alignItems: 'center' },
+  editText: { fontWeight: '700', fontSize: 14 },
+  deleteText: { color: '#ff6b6b', fontWeight: '700', fontSize: 14 },
+  emptyState: { alignItems: 'center', marginTop: 60 },
+  emptyIcon: { fontSize: 48, marginBottom: 12 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  emptySub: { fontSize: 14 },
   overlay: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
-  modal: { borderRadius: 16, padding: 24 },
-  modalTitle: { fontSize: 20, fontWeight: '700', marginBottom: 16 },
+  modal: { borderRadius: 20, padding: 24 },
+  modalTitle: { fontSize: 20, fontWeight: '800', marginBottom: 20 },
   input: {
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 15,
     marginBottom: 12,
   },
-  modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 8 },
-  cancelBtn: { paddingVertical: 10, paddingHorizontal: 16 },
+  modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 12 },
+  cancelBtn: { paddingVertical: 12, paddingHorizontal: 20 },
   cancelText: { fontSize: 15, fontWeight: '600' },
-  saveBtn: { paddingVertical: 10, paddingHorizontal: 24, borderRadius: 8 },
+  saveBtn: { paddingVertical: 12, paddingHorizontal: 28, borderRadius: 10 },
   saveBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });

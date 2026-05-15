@@ -5,13 +5,24 @@ export default function StudentCard({ student, onToggle, colors }) {
   const isPresent = student.status === 'Present';
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface }]}>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <View style={[styles.avatar, { backgroundColor: isPresent ? colors.presentBg : colors.absentBg }]}>
+        <Text style={[styles.avatarText, { color: isPresent ? colors.present : colors.absent }]}>
+          {student.name?.charAt(0)?.toUpperCase() || '?'}
+        </Text>
+      </View>
       <Text style={[styles.name, { color: colors.text }]}>{student.name}</Text>
       <TouchableOpacity
-        style={[styles.button, isPresent ? styles.present : styles.absent]}
+        style={[
+          styles.badge,
+          { backgroundColor: isPresent ? colors.present : colors.absent },
+        ]}
         onPress={() => onToggle(student.id)}
+        activeOpacity={0.7}
       >
-        <Text style={styles.buttonText}>{isPresent ? 'Present' : 'Absent'}</Text>
+        <Text style={styles.badgeText}>
+          {isPresent ? 'Present' : 'Absent'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -21,19 +32,30 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    marginVertical: 6,
-    borderRadius: 12,
+    padding: 14,
+    marginVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.03,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
+    shadowRadius: 6,
     elevation: 2,
   },
-  name: { fontSize: 16, fontWeight: '600' },
-  button: { paddingVertical: 8, paddingHorizontal: 20, borderRadius: 8 },
-  present: { backgroundColor: '#4caf50' },
-  absent: { backgroundColor: '#f44336' },
-  buttonText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  avatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  avatarText: { fontSize: 18, fontWeight: '800' },
+  name: { flex: 1, fontSize: 16, fontWeight: '600' },
+  badge: {
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+  },
+  badgeText: { color: '#fff', fontWeight: '700', fontSize: 13, letterSpacing: 0.3 },
 });

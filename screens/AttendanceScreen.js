@@ -75,16 +75,34 @@ export default function AttendanceScreen({ route, navigation }) {
     );
   }
 
+  const presentCount = students.filter((s) => s.status === 'Present').length;
+  const absentCount = students.length - presentCount;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.heading, { color: colors.text }]}>{className}</Text>
+      <View style={styles.headerRow}>
+        <View style={[styles.classBadge, { backgroundColor: colors.primary + '20' }]}>
+          <Text style={[styles.classBadgeText, { color: colors.primary }]}>{className}</Text>
+        </View>
+        <View style={styles.stats}>
+          <View style={[styles.stat, { backgroundColor: colors.presentBg }]}>
+            <Text style={[styles.statValue, { color: colors.present }]}>{presentCount}</Text>
+            <Text style={[styles.statLabel, { color: colors.present }]}>Present</Text>
+          </View>
+          <View style={[styles.stat, { backgroundColor: colors.absentBg }]}>
+            <Text style={[styles.statValue, { color: colors.absent }]}>{absentCount}</Text>
+            <Text style={[styles.statLabel, { color: colors.absent }]}>Absent</Text>
+          </View>
+        </View>
+      </View>
 
       <TouchableOpacity
         style={[styles.dateBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
         onPress={() => setShowPicker(true)}
       >
+        <Text style={[styles.dateIcon]}>📅</Text>
         <Text style={[styles.dateText, { color: colors.text }]}>{formatDate(date)}</Text>
-        <Text style={[styles.dateIcon, { color: colors.subtext }]}>📅</Text>
+        <Text style={[styles.dateCaret, { color: colors.subtext }]}>▼</Text>
       </TouchableOpacity>
 
       {showPicker && (
@@ -96,8 +114,8 @@ export default function AttendanceScreen({ route, navigation }) {
         />
       )}
 
-      <Text style={[styles.subheading, { color: colors.subtext }]}>
-        Tap a student to toggle Present/Absent
+      <Text style={[styles.hint, { color: colors.subtext }]}>
+        Tap a student to toggle status
       </Text>
 
       <FlatList
@@ -109,9 +127,9 @@ export default function AttendanceScreen({ route, navigation }) {
         )}
       />
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { borderTopColor: colors.border }]}>
         <TouchableOpacity
-          style={[styles.saveButton, { backgroundColor: colors.primary }, saving && styles.disabled]}
+          style={[styles.saveButton, { backgroundColor: colors.primary, opacity: saving ? 0.7 : 1 }]}
           onPress={handleSave}
           disabled={saving}
         >
@@ -129,23 +147,44 @@ export default function AttendanceScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  heading: { fontSize: 24, fontWeight: '800', paddingHorizontal: 20, paddingTop: 20 },
-  dateBtn: {
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 20,
-    marginTop: 12,
-    padding: 14,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  classBadge: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 10 },
+  classBadgeText: { fontSize: 14, fontWeight: '800' },
+  stats: { flexDirection: 'row', gap: 8 },
+  stat: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
     borderRadius: 10,
+    alignItems: 'center',
+  },
+  statValue: { fontSize: 18, fontWeight: '800' },
+  statLabel: { fontSize: 11, fontWeight: '600' },
+  dateBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 8,
+    padding: 14,
+    borderRadius: 12,
     borderWidth: 1,
   },
-  dateText: { fontSize: 15, fontWeight: '600' },
-  dateIcon: { fontSize: 18 },
-  subheading: { fontSize: 13, paddingHorizontal: 20, paddingBottom: 12, paddingTop: 8 },
-  list: { paddingHorizontal: 20, paddingBottom: 16 },
-  footer: { padding: 20, paddingBottom: 32 },
-  saveButton: { paddingVertical: 16, borderRadius: 12, alignItems: 'center' },
-  disabled: { opacity: 0.7 },
-  saveText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  dateIcon: { fontSize: 18, marginRight: 10 },
+  dateText: { flex: 1, fontSize: 15, fontWeight: '600' },
+  dateCaret: { fontSize: 10, fontWeight: '700' },
+  hint: { fontSize: 12, paddingHorizontal: 20, paddingTop: 14, paddingBottom: 6 },
+  list: { paddingHorizontal: 16, paddingBottom: 16 },
+  footer: {
+    padding: 16,
+    paddingBottom: 28,
+    borderTopWidth: 1,
+  },
+  saveButton: { paddingVertical: 16, borderRadius: 14, alignItems: 'center' },
+  saveText: { color: '#fff', fontSize: 17, fontWeight: '700', letterSpacing: 0.3 },
 });

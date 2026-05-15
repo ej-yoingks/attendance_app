@@ -17,35 +17,50 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function LogoutButton() {
+  const { colors } = useTheme();
   return (
-    <TouchableOpacity style={styles.logoutBtn} onPress={() => auth.signOut()}>
-      <Text style={styles.logoutText}>Logout</Text>
+    <TouchableOpacity style={styles.headerBtn} onPress={() => auth.signOut()}>
+      <Text style={{ color: colors.headerText, fontWeight: '600', fontSize: 14 }}>Logout</Text>
     </TouchableOpacity>
   );
 }
 
 function ThemeToggle() {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme, colors } = useTheme();
   return (
-    <TouchableOpacity style={styles.logoutBtn} onPress={toggleTheme}>
-      <Text style={styles.logoutText}>{isDark ? '☀️' : '🌙'}</Text>
+    <TouchableOpacity style={styles.headerBtn} onPress={toggleTheme}>
+      <Text style={{ fontSize: 18 }}>{isDark ? '☀️' : '🌙'}</Text>
     </TouchableOpacity>
   );
 }
 
-const tabScreensOptions = {
-  headerStyle: { backgroundColor: '#1a1a2e' },
-  headerTintColor: '#fff',
-  headerTitleStyle: { fontWeight: '700' },
-};
+function TabIcon({ label, focused, colors }) {
+  const icons = { HomeTab: '🏠', HistoryTab: '📊', ManageTab: '⚙️' };
+  return (
+    <Text style={{ fontSize: focused ? 22 : 20, opacity: focused ? 1 : 0.5 }}>
+      {icons[label] || '•'}
+    </Text>
+  );
+}
 
 function HomeStack() {
+  const { colors } = useTheme();
   return (
-    <Stack.Navigator screenOptions={tabScreensOptions}>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.headerBg },
+        headerTintColor: colors.headerText,
+        headerTitleStyle: { fontWeight: '700', fontSize: 18 },
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen
         name="Dashboard"
         component={DashboardScreen}
-        options={{ title: 'Home', headerRight: () => <><ThemeToggle /><LogoutButton /></> }}
+        options={{
+          title: 'Attendify',
+          headerRight: () => <><ThemeToggle /><LogoutButton /></>,
+        }}
       />
       <Stack.Screen name="ClassSelection" component={ClassSelectionScreen} options={{ title: 'Select Class' }} />
       <Stack.Screen
@@ -58,24 +73,40 @@ function HomeStack() {
 }
 
 function HistoryStack() {
+  const { colors } = useTheme();
   return (
-    <Stack.Navigator screenOptions={tabScreensOptions}>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.headerBg },
+        headerTintColor: colors.headerText,
+        headerTitleStyle: { fontWeight: '700', fontSize: 18 },
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen
         name="HistoryList"
         component={HistoryScreen}
-        options={{ title: 'History', headerRight: () => <LogoutButton /> }}
+        options={{ title: 'History', headerRight: () => <ThemeToggle /> }}
       />
     </Stack.Navigator>
   );
 }
 
 function ManageStack() {
+  const { colors } = useTheme();
   return (
-    <Stack.Navigator screenOptions={tabScreensOptions}>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.headerBg },
+        headerTintColor: colors.headerText,
+        headerTitleStyle: { fontWeight: '700', fontSize: 18 },
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen
         name="ManageClasses"
         component={ManageClassesScreen}
-        options={{ title: 'Manage' }}
+        options={{ title: 'Manage', headerRight: () => <ThemeToggle /> }}
       />
       <Stack.Screen
         name="ManageStudents"
@@ -119,31 +150,25 @@ export default function AppNavigator() {
     <NavigationContainer>
       {user ? (
         <Tab.Navigator
-          screenOptions={{
+          screenOptions={({ route }) => ({
             headerShown: false,
             tabBarStyle: {
               backgroundColor: colors.tabBar,
               borderTopColor: colors.tabBarBorder,
+              borderTopWidth: 1,
+              paddingTop: 6,
+              paddingBottom: 8,
+              height: 56,
             },
             tabBarActiveTintColor: colors.primary,
             tabBarInactiveTintColor: colors.subtext,
-          }}
+            tabBarLabelStyle: { fontSize: 11, fontWeight: '700' },
+            tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} colors={colors} />,
+          })}
         >
-          <Tab.Screen
-            name="HomeTab"
-            component={HomeStack}
-            options={{ tabBarLabel: 'Home', tabBarIcon: () => null }}
-          />
-          <Tab.Screen
-            name="HistoryTab"
-            component={HistoryStack}
-            options={{ tabBarLabel: 'History', tabBarIcon: () => null }}
-          />
-          <Tab.Screen
-            name="ManageTab"
-            component={ManageStack}
-            options={{ tabBarLabel: 'Manage', tabBarIcon: () => null }}
-          />
+          <Tab.Screen name="HomeTab" component={HomeStack} options={{ tabBarLabel: 'Home' }} />
+          <Tab.Screen name="HistoryTab" component={HistoryStack} options={{ tabBarLabel: 'History' }} />
+          <Tab.Screen name="ManageTab" component={ManageStack} options={{ tabBarLabel: 'Manage' }} />
         </Tab.Navigator>
       ) : (
         <AuthStack />
@@ -154,6 +179,5 @@ export default function AppNavigator() {
 
 const styles = StyleSheet.create({
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  logoutBtn: { marginRight: 8 },
-  logoutText: { color: '#fff', fontWeight: '600', fontSize: 15 },
+  headerBtn: { marginRight: 12 },
 });

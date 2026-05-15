@@ -35,36 +35,56 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView style={[styles.container, { backgroundColor: colors.background }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.inner}>
-        <Text style={[styles.title, { color: colors.text }]}>Attendance App</Text>
-        <Text style={[styles.subtitle, { color: colors.subtext }]}>{isSignUp ? 'Create an account' : 'Sign in to continue'}</Text>
-
-        <TextInput
-          style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
-          placeholder="Email"
-          placeholderTextColor={colors.subtext}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        <TextInput
-          style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
-          placeholder="Password"
-          placeholderTextColor={colors.subtext}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleSubmit} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{isSignUp ? 'Sign Up' : 'Login'}</Text>}
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.toggle} onPress={() => setIsSignUp(!isSignUp)}>
-          <Text style={[styles.toggleText, { color: colors.primary }]}>
-            {isSignUp ? 'Already have an account? Login' : "Don't have an account? Sign Up"}
+        <View style={styles.brandArea}>
+          <View style={[styles.iconCircle, { backgroundColor: colors.primary }]}>
+            <Text style={styles.iconText}>A</Text>
+          </View>
+          <Text style={[styles.title, { color: colors.text }]}>Attendify</Text>
+          <Text style={[styles.subtitle, { color: colors.subtext }]}>
+            {isSignUp ? 'Create your account' : 'Sign in to continue'}
           </Text>
-        </TouchableOpacity>
+        </View>
+
+        <View style={styles.form}>
+          <TextInput
+            style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
+            placeholder="Email"
+            placeholderTextColor={colors.subtext}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
+            placeholder="Password"
+            placeholderTextColor={colors.subtext}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 }]}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>{isSignUp ? 'Sign Up' : 'Sign In'}</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.toggle} onPress={() => setIsSignUp(!isSignUp)}>
+            <Text style={[styles.toggleText, { color: colors.subtext }]}>
+              {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
+              <Text style={{ color: colors.primary, fontWeight: '700' }}>
+                {isSignUp ? 'Sign In' : 'Sign Up'}
+              </Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -73,11 +93,44 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   inner: { flex: 1, justifyContent: 'center', paddingHorizontal: 32 },
-  title: { fontSize: 32, fontWeight: '800', textAlign: 'center', marginBottom: 8 },
-  subtitle: { fontSize: 16, textAlign: 'center', marginBottom: 40 },
-  input: { paddingHorizontal: 16, paddingVertical: 14, borderRadius: 12, fontSize: 16, marginBottom: 16, borderWidth: 1 },
-  button: { paddingVertical: 16, borderRadius: 12, alignItems: 'center', marginTop: 8 },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  toggle: { marginTop: 20, alignItems: 'center' },
-  toggleText: { fontSize: 14, fontWeight: '600' },
+  brandArea: { alignItems: 'center', marginBottom: 48 },
+  iconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#6c5ce7',
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 24,
+    elevation: 10,
+  },
+  iconText: { fontSize: 32, fontWeight: '800', color: '#fff' },
+  title: { fontSize: 32, fontWeight: '800', letterSpacing: -0.5, marginBottom: 6 },
+  subtitle: { fontSize: 15, textAlign: 'center' },
+  form: { width: '100%' },
+  input: {
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    borderRadius: 14,
+    fontSize: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+  },
+  button: {
+    paddingVertical: 16,
+    borderRadius: 14,
+    alignItems: 'center',
+    marginTop: 4,
+    shadowColor: '#6c5ce7',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  buttonText: { color: '#fff', fontSize: 17, fontWeight: '700', letterSpacing: 0.3 },
+  toggle: { marginTop: 24, alignItems: 'center' },
+  toggleText: { fontSize: 14 },
 });

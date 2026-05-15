@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator,
 } from 'react-native';
-import { getClasses } from '../utils/attendanceUtils';
+import { useFocusEffect } from '@react-navigation/native';
+import { db, auth } from '../services/firebaseConfig';
 import { useTheme } from '../context/ThemeContext';
 
 export default function ClassSelectionScreen({ navigation }) {
@@ -10,20 +11,24 @@ export default function ClassSelectionScreen({ navigation }) {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadClasses();
-  }, []);
-
-  async function loadClasses() {
-    try {
-      const data = await getClasses();
-      setClasses(data);
-    } catch (err) {
-      console.error('Failed to load classes:', err);
-    } finally {
-      setLoading(false);
-    }
-  }
+  useFocusEffect(
+    useCallback(() => {
+      const unsub = db
+        .collection('classes')
+        .where('teacherId', '==', auth.currentUser?.uid)
+        .onSnapshot(
+          (snapshot) => {
+            setClasses(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+            setLoading(false);
+          },
+          (err) => {
+            console.error(err);
+            setLoading(false);
+          }
+        );
+      return () => unsub();
+    }, [])
+  );
 
   if (loading) {
     return (
@@ -42,13 +47,32 @@ export default function ClassSelectionScreen({ navigation }) {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={[styles.card, { backgroundColor: colors.surface }]}
+            style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
             onPress={() => navigation.navigate('Attendance', { classId: item.id, className: item.name })}
           >
-            <Text style={[styles.cardTitle, { color: colors.text }]}>{item.name}</Text>
-            <Text style={[styles.cardSubtitle, { color: colors.subtext }]}>{item.section || ''}</Text>
+            <View style={[styles.iconBox, { backgroundColor: colors.primary + '20' }]}>
+              <Text style={[styles.iconText, { color: colors.primary }]}>
+                {item.name?.charAt(0) || 'C'}
+              </Text>
+            </View>
+            <View style={styles.textArea}>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{item.name}</Text>
+              {item.section ? (
+                <Text style={[styles.cardSub, { color: colors.subtext }]}>{item.section}</Text>
+              ) : null}
+            </View>
+            <Text style={[styles.arrow, { color: colors.subtext }]}>→</Text>
           </TouchableOpacity>
         )}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyIcon}>📚</Text>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>No Classes</Text>
+            <Text style={[styles.emptySub, { color: colors.subtext }]}>
+              Create a class in Manage first
+            </Text>
+          </View>
+        }
       />
     </View>
   );
@@ -57,9 +81,36 @@ export default function ClassSelectionScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  heading: { fontSize: 24, fontWeight: '800', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 12 },
-  list: { paddingHorizontal: 20, paddingBottom: 24 },
-  card: { padding: 20, borderRadius: 12, marginVertical: 6, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 2 }, shadowRadius: 8, elevation: 2 },
-  cardTitle: { fontSize: 18, fontWeight: '600' },
-  cardSubtitle: { fontSize: 14, marginTop: 4 },
+  heading: { fontSize: 26, fontWeight: '800', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 14, letterSpacing: -0.5 },
+  list: { paddingHorizontal: 16, paddingBottom: 24 },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 18,
+    borderRadius: 16,
+    marginVertical: 5,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.03,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  iconBox: {
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 14,
+  },
+  iconText: { fontSize: 22, fontWeight: '800' },
+  textArea: { flex: 1 },
+  cardTitle: { fontSize: 17, fontWeight: '700' },
+  cardSub: { fontSize: 13, marginTop: 3 },
+  arrow: { fontSize: 20, fontWeight: '300' },
+  emptyState: { alignItems: 'center', marginTop: 60 },
+  emptyIcon: { fontSize: 48, marginBottom: 12 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  emptySub: { fontSize: 14 },
 });
