@@ -43,7 +43,7 @@ export default function DashboardScreen({ navigation }) {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text style={[styles.greeting, { color: colors.text }]}>
-          Hello, {teacherName}
+          Good Day!
         </Text>
         <Text style={[styles.subtitle, { color: colors.subtext }]}>
           {classes.length} class{classes.length !== 1 ? 'es' : ''} available
