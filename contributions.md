@@ -1,10 +1,10 @@
-#Contributions by the members.
+# Contributions by the members.
 
-##Alberto
+## Alberto
 - 
-##Bueno
+## Bueno
 - 
-##Gida
+## Gida
 - 
-##Yoingco
+## Yoingco
 - 
